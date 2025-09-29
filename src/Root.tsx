@@ -277,136 +277,112 @@ export const RemotionRoot: React.FC = () => {
         height={1920}
         schema={combinedSimplifiedShowcaseSchema}
         calculateMetadata={combinedSimplifiedShowcaseCalculateMetadata}
+        // Preview proxies should be stored under public/preview (see public/preview/README.md).
         defaultProps={{
-"backgroundMusic": [
-	"https://ace.aigcs.io/n8n-youtube/audio/test/PASSO%20BEM%20SOLTO.mp3?dds=BSisoBBQ9kfc5Vwtr2YouT7uber"
-    ],
-    "coverImageUrl": "https://internal-api-drive-stream.feishu.cn/space/api/box/stream/download/authcode/?code=MiTabbacsieIIEKj35583VOwpK66wMY",
-    "episodeNumber": 0,
-    "segments": [
-      {
-        "cameraEffects": "",
-        "subtitles": [],
-        "backgroundImages": [
-          "https://ark-content-generation-cn-beijing.tos-cn-beijing.volces.com/doubao-seedance-1-0-pro/02175852392667700000000000000000000ffffac159606d84189.mp4?X-Tos-Algorithm=TOS4-HMAC-SHA256&X-Tos-Credential=AKLTYWJkZTExNjA1ZDUyNDc3YzhjNTM5OGIyNjBhNDcyOTQ%2F20250922%2Fcn-beijing%2Ftos%2Frequest&X-Tos-Date=20250922T065255Z&X-Tos-Expires=86400&X-Tos-Signature=69ae92dc96beac732ddd2e80babeed82df88d6fe98f54e1bc8e41f067135c366&X-Tos-SignedHeaders=host"
-        ],
-        "font_style": "white-black-outline",
-        "speaker_audio": []
-      },
-      {
-        "cameraEffects": "",
-        "subtitles": [],
-        "backgroundImages": [
-          "https://ark-content-generation-cn-beijing.tos-cn-beijing.volces.com/doubao-seedance-1-0-pro/02175852398161900000000000000000000ffffac159606ee0126.mp4?X-Tos-Algorithm=TOS4-HMAC-SHA256&X-Tos-Credential=AKLTYWJkZTExNjA1ZDUyNDc3YzhjNTM5OGIyNjBhNDcyOTQ%2F20250922%2Fcn-beijing%2Ftos%2Frequest&X-Tos-Date=20250922T065354Z&X-Tos-Expires=86400&X-Tos-Signature=6f70dee281d9b8a855833eecbb11bb697dec3b6e88796488d7c1d8edb11b69f2&X-Tos-SignedHeaders=host"
-        ],
-        "font_style": "white-black-outline",
-        "speaker_audio": []
-      },
-      {
-        "cameraEffects": "",
-        "subtitles": [],
-        "backgroundImages": [
-          "https://ark-content-generation-cn-beijing.tos-cn-beijing.volces.com/doubao-seedance-1-0-pro/02175852403957400000000000000000000ffffac1596065da8c7.mp4?X-Tos-Algorithm=TOS4-HMAC-SHA256&X-Tos-Credential=AKLTYWJkZTExNjA1ZDUyNDc3YzhjNTM5OGIyNjBhNDcyOTQ%2F20250922%2Fcn-beijing%2Ftos%2Frequest&X-Tos-Date=20250922T065441Z&X-Tos-Expires=86400&X-Tos-Signature=0ed575e5ceb198b147e0b43b478d2379b618839ea7553d1b55c9638cde96e850&X-Tos-SignedHeaders=host"
-        ],
-        "font_style": "white-black-outline",
-        "speaker_audio": []
-      },
-      {
-        "cameraEffects": "",
-        "subtitles": [],
-        "backgroundImages": [
-          "https://ark-content-generation-cn-beijing.tos-cn-beijing.volces.com/doubao-seedance-1-0-pro/02175852408721000000000000000000000ffffac1596063f1d42.mp4?X-Tos-Algorithm=TOS4-HMAC-SHA256&X-Tos-Credential=AKLTYWJkZTExNjA1ZDUyNDc3YzhjNTM5OGIyNjBhNDcyOTQ%2F20250922%2Fcn-beijing%2Ftos%2Frequest&X-Tos-Date=20250922T065531Z&X-Tos-Expires=86400&X-Tos-Signature=12b64435805c94f55c3b34cffe21aa52088070021543848f1ceae13bdcb199f9&X-Tos-SignedHeaders=host"
-        ],
-        "font_style": "white-black-outline",
-        "speaker_audio": []
-      },
-      {
-        "cameraEffects": "",
-        "subtitles": [],
-        "backgroundImages": [
-          "https://ark-content-generation-cn-beijing.tos-cn-beijing.volces.com/doubao-seedance-1-0-pro/02175852413918900000000000000000000ffffac159606d8ac9c.mp4?X-Tos-Algorithm=TOS4-HMAC-SHA256&X-Tos-Credential=AKLTYWJkZTExNjA1ZDUyNDc3YzhjNTM5OGIyNjBhNDcyOTQ%2F20250922%2Fcn-beijing%2Ftos%2Frequest&X-Tos-Date=20250922T065625Z&X-Tos-Expires=86400&X-Tos-Signature=e589a7c5540680dc9360b581a6a7694aab8a0f0ba33d096f727691bf49a726cb&X-Tos-SignedHeaders=host"
-        ],
-        "font_style": "white-black-outline",
-        "speaker_audio": []
-      },
-      {
-        "cameraEffects": "",
-        "subtitles": [],
-        "backgroundImages": [
-          "https://ark-content-generation-cn-beijing.tos-cn-beijing.volces.com/doubao-seedance-1-0-pro/02175852418992200000000000000000000ffffac159606253e77.mp4?X-Tos-Algorithm=TOS4-HMAC-SHA256&X-Tos-Credential=AKLTYWJkZTExNjA1ZDUyNDc3YzhjNTM5OGIyNjBhNDcyOTQ%2F20250922%2Fcn-beijing%2Ftos%2Frequest&X-Tos-Date=20250922T065656Z&X-Tos-Expires=86400&X-Tos-Signature=18f95f9d01e89de7659bf46437d63a4dd0b85dd727b2d2637769ef83b99b9bce&X-Tos-SignedHeaders=host"
-        ],
-        "font_style": "white-black-outline",
-        "speaker_audio": []
-      },
-      {
-        "cameraEffects": "",
-        "subtitles": [],
-        "backgroundImages": [
-          "https://ark-content-generation-cn-beijing.tos-cn-beijing.volces.com/doubao-seedance-1-0-pro/02175852422237900000000000000000000ffffac1596068b470d.mp4?X-Tos-Algorithm=TOS4-HMAC-SHA256&X-Tos-Credential=AKLTYWJkZTExNjA1ZDUyNDc3YzhjNTM5OGIyNjBhNDcyOTQ%2F20250922%2Fcn-beijing%2Ftos%2Frequest&X-Tos-Date=20250922T065735Z&X-Tos-Expires=86400&X-Tos-Signature=7e75f9857048d382223c47530aa2e32fe820a9befcd130e96f731ab8986b2ed5&X-Tos-SignedHeaders=host"
-        ],
-        "font_style": "white-black-outline",
-        "speaker_audio": []
-      },
-      {
-        "cameraEffects": "",
-        "subtitles": [],
-        "backgroundImages": [
-          "https://ark-content-generation-cn-beijing.tos-cn-beijing.volces.com/doubao-seedance-1-0-pro/02175852426076100000000000000000000ffffac159606c9e39e.mp4?X-Tos-Algorithm=TOS4-HMAC-SHA256&X-Tos-Credential=AKLTYWJkZTExNjA1ZDUyNDc3YzhjNTM5OGIyNjBhNDcyOTQ%2F20250922%2Fcn-beijing%2Ftos%2Frequest&X-Tos-Date=20250922T065813Z&X-Tos-Expires=86400&X-Tos-Signature=446daa29f24383dfa7a4f51df31c594f88e1465f1ae37cbe29b4273e415e1230&X-Tos-SignedHeaders=host"
-        ],
-        "font_style": "white-black-outline",
-        "speaker_audio": []
-      },
-      {
-        "cameraEffects": "",
-        "subtitles": [],
-        "backgroundImages": [
-          "https://ark-content-generation-cn-beijing.tos-cn-beijing.volces.com/doubao-seedance-1-0-pro/02175852429989600000000000000000000ffffac1596062f5423.mp4?X-Tos-Algorithm=TOS4-HMAC-SHA256&X-Tos-Credential=AKLTYWJkZTExNjA1ZDUyNDc3YzhjNTM5OGIyNjBhNDcyOTQ%2F20250922%2Fcn-beijing%2Ftos%2Frequest&X-Tos-Date=20250922T065853Z&X-Tos-Expires=86400&X-Tos-Signature=f4078056b20d302cdad72cb4b4db102af34a79000447f4ac2c868181fa62ee62&X-Tos-SignedHeaders=host"
-        ],
-        "font_style": "white-black-outline",
-        "speaker_audio": []
-      },
-      {
-        "cameraEffects": "",
-        "subtitles": [],
-        "backgroundImages": [
-          "https://ark-content-generation-cn-beijing.tos-cn-beijing.volces.com/doubao-seedance-1-0-pro/02175852433890600000000000000000000ffffac159606a7be0d.mp4?X-Tos-Algorithm=TOS4-HMAC-SHA256&X-Tos-Credential=AKLTYWJkZTExNjA1ZDUyNDc3YzhjNTM5OGIyNjBhNDcyOTQ%2F20250922%2Fcn-beijing%2Ftos%2Frequest&X-Tos-Date=20250922T065934Z&X-Tos-Expires=86400&X-Tos-Signature=e94ce0f6840425328c6a30c9345680ee76a6293a3549ce3e37915e1f8377ebba&X-Tos-SignedHeaders=host"
-        ],
-        "font_style": "white-black-outline",
-        "speaker_audio": []
-      },
-      {
-        "cameraEffects": "",
-        "subtitles": [],
-        "backgroundImages": [
-          "https://ark-content-generation-cn-beijing.tos-cn-beijing.volces.com/doubao-seedance-1-0-pro/02175852438192800000000000000000000ffffac159606d13032.mp4?X-Tos-Algorithm=TOS4-HMAC-SHA256&X-Tos-Credential=AKLTYWJkZTExNjA1ZDUyNDc3YzhjNTM5OGIyNjBhNDcyOTQ%2F20250922%2Fcn-beijing%2Ftos%2Frequest&X-Tos-Date=20250922T070029Z&X-Tos-Expires=86400&X-Tos-Signature=ff3a2ed1f8266be08961cfc4867ef06d822ac0958c72bd0d32e4efa515ce6a24&X-Tos-SignedHeaders=host"
-        ],
-        "font_style": "white-black-outline",
-        "speaker_audio": []
-      }
-    ]
-}}
-      />
-      <Composition
-        id="SimplifiedShowcase-NoAudio"
-        component={SimplifiedShowcase}
-        durationInFrames={900} // 30秒（3张图片，每张10秒；或者视频的实际时长）
-        fps={30}
-        width={1920}
-        height={1080}
-        defaultProps={{
-          cameraEffects: "zoom-in",
-          // 没有 speaker_audio，测试只依赖背景媒体时长的情况
-          subtitles: [
-            "第一张图片展示5秒",
-            "第二张图片展示5秒",
-            "第三张图片展示5秒",
+          backgroundMusic: ["/preview/audio/passo-bem-solto.mp3"],
+          coverImageUrl: "/preview/images/combined-simplified-cover.png",
+          episodeNumber: 0,
+          segments: [
+            {
+              cameraEffects: "",
+              subtitles: [],
+              backgroundImages: [
+                "/preview/background/0217585239266770000000000000000000ffffac159606d84189.mp4",
+              ],
+              font_style: "white-black-outline",
+              speaker_audio: [],
+            },
+            {
+              cameraEffects: "",
+              subtitles: [],
+              backgroundImages: [
+                "/preview/background/0217585239816190000000000000000000ffffac159606ee0126.mp4",
+              ],
+              font_style: "white-black-outline",
+              speaker_audio: [],
+            },
+            {
+              cameraEffects: "",
+              subtitles: [],
+              backgroundImages: [
+                "/preview/background/0217585240395740000000000000000000ffffac1596065da8c7.mp4",
+              ],
+              font_style: "white-black-outline",
+              speaker_audio: [],
+            },
+            {
+              cameraEffects: "",
+              subtitles: [],
+              backgroundImages: [
+                "/preview/background/0217585240872100000000000000000000ffffac1596063f1d42.mp4",
+              ],
+              font_style: "white-black-outline",
+              speaker_audio: [],
+            },
+            {
+              cameraEffects: "",
+              subtitles: [],
+              backgroundImages: [
+                "/preview/background/0217585241391890000000000000000000ffffac159606d8ac9c.mp4",
+              ],
+              font_style: "white-black-outline",
+              speaker_audio: [],
+            },
+            {
+              cameraEffects: "",
+              subtitles: [],
+              backgroundImages: [
+                "/preview/background/0217585241899220000000000000000000ffffac159606253e77.mp4",
+              ],
+              font_style: "white-black-outline",
+              speaker_audio: [],
+            },
+            {
+              cameraEffects: "",
+              subtitles: [],
+              backgroundImages: [
+                "/preview/background/0217585242223790000000000000000000ffffac1596068b470d.mp4",
+              ],
+              font_style: "white-black-outline",
+              speaker_audio: [],
+            },
+            {
+              cameraEffects: "",
+              subtitles: [],
+              backgroundImages: [
+                "/preview/background/0217585242607610000000000000000000ffffac159606c9e39e.mp4",
+              ],
+              font_style: "white-black-outline",
+              speaker_audio: [],
+            },
+            {
+              cameraEffects: "",
+              subtitles: [],
+              backgroundImages: [
+                "/preview/background/0217585242998960000000000000000000ffffac1596062f5423.mp4",
+              ],
+              font_style: "white-black-outline",
+              speaker_audio: [],
+            },
+            {
+              cameraEffects: "",
+              subtitles: [],
+              backgroundImages: [
+                "/preview/background/0217585243389060000000000000000000ffffac159606a7be0d.mp4",
+              ],
+              font_style: "white-black-outline",
+              speaker_audio: [],
+            },
+            {
+              cameraEffects: "",
+              subtitles: [],
+              backgroundImages: [
+                "/preview/background/0217585243819280000000000000000000ffffac159606d13032.mp4",
+              ],
+              font_style: "white-black-outline",
+              speaker_audio: [],
+            },
           ],
-          backgroundImages: [
-            "https://p9-dreamina-sign.byteimg.com/tos-cn-i-tb4s082cfz/c18e4c54eddb4c008c96f893fe5a7475~tplv-tb4s082cfz-aigc_resize_mark:0:0.jpeg?lk3s=43402efa&x-expires=1754784000&x-signature=Ku7iHFRAWzpfqvYJorPLDykmREk%3D&format=.jpeg",
-            "https://p9-dreamina-sign.byteimg.com/tos-cn-i-tb4s082cfz/c18e4c54eddb4c008c96f893fe5a7475~tplv-tb4s082cfz-aigc_resize_mark:0:0.jpeg?lk3s=43402efa&x-expires=1754784000&x-signature=Ku7iHFRAWzpfqvYJorPLDykmREk%3D&format=.jpeg",
-            "https://p9-dreamina-sign.byteimg.com/tos-cn-i-tb4s082cfz/c18e4c54eddb4c008c96f893fe5a7475~tplv-tb4s082cfz-aigc_resize_mark:0:0.jpeg?lk3s=43402efa&x-expires=1754784000&x-signature=Ku7iHFRAWzpfqvYJorPLDykmREk%3D&format=.jpeg",
-          ],
-          font_style: "white-black-outline",
         }}
       />
       <Composition
