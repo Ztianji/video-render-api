@@ -1,0 +1,383 @@
+import React, { useEffect, useState, useMemo } from 'react';
+import {
+  AbsoluteFill,
+  useCurrentFrame,
+  useVideoConfig,
+  Sequence,
+  CalculateMetadataFunction,
+  Audio,
+  Img,
+  staticFile,
+  getRemotionEnvironment,   // NEW
+} from 'remotion';
+import { getAudioData, getVideoMetadata } from '@remotion/media-utils';
+import { z } from 'zod';
+import { SimplifiedShowcase } from './SimplifiedShowcase';
+
+const showcaseSegmentSchema = z.object({
+  cameraEffects: z.string(),
+  speaker_audio: z.array(z.string()),
+  subtitles: z.array(z.string()),
+  backgroundImages: z.array(z.string()).optional(),
+  font_style: z.string(),
+});
+
+export const combinedSimplifiedShowcaseSchema = z.object({
+  segments: z.array(showcaseSegmentSchema),
+  backgroundMusic: z.array(z.string()).optional(),
+  coverImageUrl: z.string().optional(),
+  episodeNumber: z.number().optional(),
+  // 进阶注入真实时长时可增加 hidden 字段（此处暂不加）
+});
+
+export type CombinedSimplifiedShowcaseProps = z.infer<typeof combinedSimplifiedShowcaseSchema>;
+
+const { isStudio } = getRemotionEnvironment(); // 在浏览器预览时为 true
+console.log('isStudio: ', isStudio);
+console.log('env =', getRemotionEnvironment());
+
+// 统一：提取 → decode → 返回干净文件名
+const extractFileName = (url: string) => {
+  try {
+    const noQuery = url.split(/[?#]/)[0];
+    let name = noQuery.substring(noQuery.lastIndexOf('/') + 1);
+    // 防止双重编码：先 decode 一次
+    try {
+      name = decodeURIComponent(name);
+    } catch {}
+    // 可选：去掉奇怪的换行/空白
+    name = name.trim();
+    return name;
+  } catch {
+    return url;
+  }
+};
+
+
+// 预览阶段把远程 URL 替换成本地；渲染阶段直接用远程
+const resolveAudioUrl = (remoteUrl: string): string => {
+  if (!isStudio) return remoteUrl; // 渲染/服务器端
+  // 本地文件命名策略：与远程最后文件名一致
+  const name = extractFileName(remoteUrl);
+  console.log('AudioUrl: ', name);
+  // 你需要确保 public/audio 下存在这个文件；否则用占位
+  return staticFile(`audio/${name}`);
+};
+
+// 如果本地不存在对应文件，可 fallback
+const resolveWithFallback = (remoteUrl: string): string => {
+  const candidate = resolveAudioUrl(remoteUrl);
+  // 无法在运行期同步判断文件是否存在；建议保证放好
+  // 或使用一个白名单/映射表
+  return candidate;
+};
+
+// 媒体类型判断函数保留原样
+const getMediaType = (url: string): 'image' | 'video' => {
+  const lowerUrl = url.toLowerCase();
+  const imageExtensions = ['jpg','jpeg','png','gif','bmp','webp','svg'];
+  const videoExtensions = ['mp3','mp4','mov','avi','mkv','webm','m4v','flv','wmv'];
+  for (const ext of videoExtensions) if (lowerUrl.includes(`.${ext}`)) return 'video';
+  for (const ext of imageExtensions) if (lowerUrl.includes(`.${ext}`)) return 'image';
+  try {
+    const urlObj = new URL(url);
+    const format = urlObj.searchParams.get('format');
+    if (format) {
+      const formatExt = format.replace('.','').toLowerCase();
+      if (videoExtensions.includes(formatExt)) return 'video';
+      if (imageExtensions.includes(formatExt)) return 'image';
+    }
+  } catch {}
+  if (lowerUrl.includes('doubao-seedance') || (lowerUrl.includes('tos-cn') && lowerUrl.includes('mp4'))) return 'video';
+  if (lowerUrl.includes('dreamina') || lowerUrl.includes('byteimg')) return 'image';
+  return 'image';
+};
+
+export const CombinedSimplifiedShowcase: React.FC<CombinedSimplifiedShowcaseProps> = ({
+  segments = [],
+  backgroundMusic = [],
+  coverImageUrl,
+  episodeNumber,
+}) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const backgroundColor = '#000';
+  const coverDurationInFrames = (coverImageUrl || episodeNumber) ? 1 : 0;
+
+  // 1. 预览阶段把音频数组替换为本地
+  const resolvedSegments = useMemo(() => {
+    if (!isStudio) return segments;
+    return segments.map(s => ({
+      ...s,
+      speaker_audio: s.speaker_audio.map(resolveWithFallback),
+    }));
+  }, [segments]);
+
+  const resolvedBackgroundMusic = useMemo(() => {
+    if (!isStudio) return backgroundMusic;
+    return backgroundMusic.map(resolveWithFallback);
+  }, [backgroundMusic]);
+
+  const [segmentDurations, setSegmentDurations] = useState<number[]>([]);
+  const [backgroundMusicDurations, setBackgroundMusicDurations] = useState<number[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const loadAll = async () => {
+      const segDur: number[] = [];
+
+      // 使用“已替换后的”数组获取时长，预览时即为本地文件 → 避免 CORS
+      for (const seg of resolvedSegments) {
+        let total = 0;
+
+        if (seg.speaker_audio?.length) {
+          for (const a of seg.speaker_audio) {
+            try {
+              const data = await getAudioData(a);
+              total += data.durationInSeconds;
+            } catch (e) {
+              console.warn('音频加载失败（使用默认3秒）', a, e);
+              total += 3;
+            }
+          }
+        } else if (seg.backgroundImages?.length) {
+          for (const media of seg.backgroundImages) {
+            try {
+              const t = getMediaType(media);
+              if (t === 'video') {
+                const v = await getVideoMetadata(media);
+                total += v.durationInSeconds;
+              } else {
+                total += 5;
+              }
+            } catch (e) {
+              console.warn('背景媒体元数据失败，使用默认', media, e);
+              total += getMediaType(media) === 'video' ? 3 : 5;
+            }
+          }
+        } else {
+            total = 5;
+        }
+        segDur.push(Math.max(total, 1));
+      }
+
+      const bgDur: number[] = [];
+      for (const m of resolvedBackgroundMusic) {
+        try {
+          const d = await getAudioData(m);
+          bgDur.push(d.durationInSeconds);
+        } catch (e) {
+          console.warn('背景音乐加载失败，默认30秒', m, e);
+          bgDur.push(30);
+        }
+      }
+
+      setSegmentDurations(segDur);
+      setBackgroundMusicDurations(bgDur);
+      setIsLoading(false);
+    };
+
+    if (resolvedSegments.length) {
+      loadAll();
+    } else {
+      setIsLoading(false);
+    }
+  }, [resolvedSegments, resolvedBackgroundMusic]);
+
+  const effectiveSegmentDurations = isLoading
+    ? resolvedSegments.map(() => 5)
+    : (segmentDurations.length ? segmentDurations : resolvedSegments.map(() => 5));
+
+  const segmentStartFrames = effectiveSegmentDurations.reduce((acc, dur, i) => {
+    if (i === 0) acc.push(coverDurationInFrames);
+    else {
+      const prevStart = acc[i - 1];
+      const prevDur = effectiveSegmentDurations[i - 1] * fps;
+      acc.push(prevStart + prevDur);
+    }
+    return acc;
+  }, [] as number[]);
+
+  const totalDuration = effectiveSegmentDurations.reduce((s, d) => s + d, 0);
+
+  const generateBackgroundMusicSequences = () => {
+    if (!resolvedBackgroundMusic.length || !backgroundMusicDurations.length) return [];
+    const totalFrames = totalDuration * fps;
+    const seqs: {
+      musicUrl: string;
+      startFrame: number;
+      durationInFrames: number;
+      volume: number;
+    }[] = [];
+    let cur = 0;
+    let idx = 0;
+
+    while (cur < totalFrames) {
+      const durSec = backgroundMusicDurations[idx];
+      const durFrames = Math.min(durSec * fps, totalFrames - cur);
+      seqs.push({
+        musicUrl: resolvedBackgroundMusic[idx],
+        startFrame: cur,
+        durationInFrames: durFrames,
+        volume: 0.3,
+      });
+      cur += durFrames;
+      idx = resolvedBackgroundMusic.length === 1 ? 0 : (idx + 1) % resolvedBackgroundMusic.length;
+    }
+    return seqs;
+  };
+
+  const backgroundMusicSequences = generateBackgroundMusicSequences();
+
+  const getCurrentSegmentIndex = () => {
+    if (frame === 0) return -1;
+    for (let i = 0; i < segmentStartFrames.length; i++) {
+      const start = segmentStartFrames[i];
+      const end = start + effectiveSegmentDurations[i] * fps;
+      if (frame >= start && frame < end) return i;
+    }
+    return segmentStartFrames.length - 1;
+  };
+  const currentSegmentIndex = getCurrentSegmentIndex();
+
+  return (
+    <AbsoluteFill style={{ background: backgroundColor, overflow: 'hidden' }}>
+      {frame === 0 && (coverImageUrl || episodeNumber) && (
+        <AbsoluteFill style={{ zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          {coverImageUrl && (
+            <Img
+              src={coverImageUrl}
+              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 1 }}
+              alt="封面"
+            />
+          )}
+          {episodeNumber && (
+            <div
+              style={{
+                position: 'relative',
+                zIndex: 3,
+                fontSize: '180px',
+                fontWeight: 'bold',
+                color: '#FFA500',
+                filter: 'drop-shadow(0 0 8px rgba(255, 255, 255, 0.7))',
+                textShadow: `
+                  0 0 10px rgba(0,0,0,0.3),
+                  0 0 20px rgba(0,0,0,0.2),
+                  0 0 30px rgba(255,255,255,0.3),
+                  0 0 40px rgba(255,255,255,0.2)
+                `,
+                padding: '20px 40px',
+                fontFamily: '"WenQuanYi Micro Hei","Noto Sans CJK SC","思源黑体",sans-serif',
+                borderRadius: '10px',
+              }}
+            >
+              {episodeNumber}
+            </div>
+          )}
+        </AbsoluteFill>
+      )}
+
+      {backgroundMusicSequences.map((bg, i) => (
+        <Sequence key={`bg-${i}`} from={bg.startFrame} durationInFrames={bg.durationInFrames}>
+          <Audio src={bg.musicUrl} volume={() => bg.volume} />
+        </Sequence>
+      ))}
+
+      {resolvedSegments.map((seg, i) => {
+        const start = segmentStartFrames[i];
+        const durFrames = effectiveSegmentDurations[i] * fps;
+        return (
+          <Sequence key={`seg-${i}`} from={start} durationInFrames={durFrames}>
+            <SimplifiedShowcase
+              cameraEffects={seg.cameraEffects}
+              speaker_audio={seg.speaker_audio}
+              subtitles={seg.subtitles}
+              backgroundImages={seg.backgroundImages}
+              font_style={seg.font_style}
+            />
+          </Sequence>
+        );
+      })}
+
+      {process.env.NODE_ENV === 'development' && (
+        <div
+          style={{
+            position: 'absolute',
+            top: 20,
+            right: 20,
+            color: 'white',
+            fontSize: 14,
+            backgroundColor: 'rgba(0,0,0,0.7)',
+            padding: 10,
+            borderRadius: 4,
+            zIndex: 2000,
+            textAlign: 'right',
+            lineHeight: 1.4,
+          }}
+        >
+          <div>环境: {isStudio ? 'Studio(预览本地音频)' : '渲染/服务器'}</div>
+          <div>当前帧: {frame}</div>
+          <div>片段数: {resolvedSegments.length}</div>
+          <div>背景音乐数: {resolvedBackgroundMusic.length}</div>
+          <div>总时长(秒): {totalDuration.toFixed(2)}{isLoading ? ' (加载中)' : ''}</div>
+          {currentSegmentIndex === -1 ? (
+            <div>当前: 封面</div>
+          ) : (
+            <>
+              <div>当前片段: {currentSegmentIndex + 1}</div>
+              <div>片段时长: {effectiveSegmentDurations[currentSegmentIndex]?.toFixed(2)}s</div>
+            </>
+          )}
+        </div>
+      )}
+    </AbsoluteFill>
+  );
+};
+
+// 维持原 calculateMetadata（后面有进阶优化版本）
+export const calculateMetadata: CalculateMetadataFunction<CombinedSimplifiedShowcaseProps> = async ({ props }) => {
+  const { segments = [] } = props;
+  if (!segments.length) {
+    return { durationInFrames: 150, fps: 30, width: 1080, height: 1920 };
+  }
+  let total = 0;
+  for (let i = 0; i < segments.length; i++) {
+    const seg = segments[i];
+    let segDur = 0;
+    try {
+      if (seg.speaker_audio?.length) {
+        for (const a of seg.speaker_audio) {
+          try {
+            const d = await getAudioData(a);
+            segDur += d.durationInSeconds;
+          } catch {
+            segDur += 3;
+          }
+        }
+      } else if (seg.backgroundImages?.length) {
+        for (const m of seg.backgroundImages) {
+          try {
+            if (getMediaType(m) === 'video') {
+              const v = await getVideoMetadata(m);
+              segDur += v.durationInSeconds;
+            } else {
+              segDur += 5;
+            }
+          } catch {
+            segDur += getMediaType(m) === 'video' ? 3 : 5;
+          }
+        }
+      } else {
+        segDur = 5;
+      }
+      segDur = Math.max(segDur, 1);
+      total += segDur;
+    } catch {
+      total += 5;
+    }
+  }
+  const fps = 30;
+  const frames = Math.max(Math.ceil(total * fps), 150);
+  return { durationInFrames: frames, fps, width: 1080, height: 1920 };
+};
+
